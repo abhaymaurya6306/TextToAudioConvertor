@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeechSynth Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .visualizer {
+            display: flex;
+            height: 100px;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .bar {
+            background: linear-gradient(to top, var(--primary), var(--accent));
+            width: 8px;
+            border-radius: 4px;
+            transition: height 0.15s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <h1 class="text-2xl font-bold">SpeechSynth Pro</h1>
+                </div>
+            </div>
+            <p class="mt-2 opacity-90">Convert text to natural sounding audio instantly</p>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="textInput" class="block text-sm font-medium text-gray-700 mb-2">Text to convert:</label>
+                            <textarea 
+                                id="textInput" 
+                                rows="8" 
+                                class="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="Type or paste your text here..."></textarea>
+                            
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label for="voiceSelect" class="block text-sm font-medium text-gray-700 mb-1">Voice:</label>
+                                    <select id="voiceSelect" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Loading voices...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="rateSelect" class="block text-sm font-medium text-gray-700 mb-1">Speed:</label>
+                                    <select id="rateSelect" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="0.5">0.5x Slow</option>
+                                        <option value="0.8">0.8x</option>
+                                        <option value="1" selected>1.0x Normal</option>
+                                        <option value="1.2">1.2x</option>
+                                        <option value="1.5">1.5x Fast</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 flex space-x-4">
+                                <button id="playBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Play</span>
+                                </button>
+                                <button id="pauseBtn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Pause</span>
+                                </button>
+                                <button id="stopBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Stop</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Audio Output:</label>
+                            <div id="waveform" class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+                                <div class="visualizer w-full h-full p-4 hidden">
+                                    <!-- Visualizer bars will be added dynamically -->
+                                </div>
+                                <p class="text-gray-500 text-center px-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                    </svg>
+                                    Audio visualization will appear here
+                                </p>
+                            </div>
+                            
+                            <div id="controls" class="mt-4 hidden">
+                                <button id="downloadBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Download Audio</span>
+                                </button>
+                                
+                                <div class="mt-3 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label for="audioFormat" class="block text-sm font-medium text-gray-700 mb-1">Format:</label>
+                                        <select id="audioFormat" class="w-full p-2 border border-gray-300 rounded-md">
+                                            <option value="wav">WAV</option>
+                                            <option value="mp3">MP3</option>
+                                            <option value="ogg">OGG</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="audioQuality" class="block text-sm font-medium text-gray-700 mb-1">Quality:</label>
+                                        <select id="audioQuality" class="w-full p-2 border border-gray-300 rounded-md">
+                                            <option value="high">High</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gradient-bg text-white p-4">
+                    <h3 class="text-lg font-semibold mb-2">Available Voices</h3>
+                    <div id="voiceGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <!-- Voice cards will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="gradient-bg text-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>SpeechSynth Pro - Text to Speech Converter © 2023</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const textInput = document.getElementById('textInput');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const rateSelect = document.getElementById('rateSelect');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const waveform = document.getElementById('waveform');
+            const visualizer = waveform.querySelector('.visualizer');
+            const controls = document.getElementById('controls');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const audioFormat = document.getElementById('audioFormat');
+            const audioQuality = document.getElementById('audioQuality');
+            const voiceGallery = document.getElementById('voiceGallery');
+            
+            // Speech Synthesis
+            const synth = window.speechSynthesis;
+            let voices = [];
+            let utterance = null;
+            let isPlaying = false;
+            let audioContext;
+            let analyser;
+            let dataArray;
+            let animationId;
+            
+            // Sample sentences for voice preview
+            const sampleSentences = [
+                "Hello, welcome to our text to speech service.",
+                "The quick brown fox jumps over the lazy dog.",
+                "This voice has a natural and clear pronunciation.",
+                "You can adjust the speech rate and pitch as needed.",
+                "We support multiple languages and dialects."
+            ];
+            
+            // Initialize the application
+            function init() {
+                loadVoices();
+                
+                // Fallback if voices aren't loaded immediately
+                if (synth.onvoiceschanged !== undefined) {
+                    synth.onvoiceschanged = loadVoices;
+                }
+                
+                setupEventListeners();
+                createVisualizerBars();
+            }
+            
+            // Load available voices
+            function loadVoices() {
+                voices = synth.getVoices();
+                voiceSelect.innerHTML = '';
+                voiceGallery.innerHTML = '';
+                
+                if (voices.length === 0) {
+                    voiceSelect.innerHTML = '<option value="">No voices available</option>';
+                    return;
+                }
+                
+                // Populate dropdown
+                voices.forEach((voice, i) => {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' - DEFAULT' : ''}`;
+                    voiceSelect.appendChild(option);
+                    
+                    // Create voice cards in gallery
+                    createVoiceCard(voice, i);
+                });
+                
+                // Select default voice
+                const defaultVoiceIndex = voices.findIndex(voice => voice.default);
+                if (defaultVoiceIndex !== -1) {
+                    voiceSelect.value = defaultVoiceIndex;
+                }
+            }
+            
+            // Create voice preview cards
+            function createVoiceCard(voice, index) {
+                const card = document.createElement('div');
+                card.className = 'bg-white bg-opacity-10 rounded-lg p-3 hover:bg-opacity-20 transition cursor-pointer';
+                card.setAttribute('data-voice-index', index);
+                
+                const randomSentence = sampleSentences[Math.floor(Math.random() * sampleSentences.length)];
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h4 class="font-medium">${voice.name}</h4>
+                            <p class="text-xs opacity-80">${voice.lang}</p>
+                        </div>
+                        <button class="voice-play-btn p-2 rounded-full bg-white bg-opacity-10 hover:bg-opacity-30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-xs truncate" title="${randomSentence}">"${randomSentence}"</p>
+                `;
+                
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.voice-play-btn')) {
+                        voiceSelect.value = index;
+                        return;
+                    }
+                    
+                    const btn = e.target.closest('.voice-play-btn');
+                    btn.classList.add('pulse');
+                    
+                    // Stop any currently playing preview
+                    synth.cancel();
+                    
+                    // Create and speak the preview
+                    const preview = new SpeechSynthesisUtterance(randomSentence);
+                    preview.voice = voice;
+                    preview.rate = 1;
+                    preview.pitch = 1;
+                    
+                    preview.onend = () => {
+                        btn.classList.remove('pulse');
+                    };
+                    
+                    synth.speak(preview);
+                });
+                
+                voiceGallery.appendChild(card);
+            }
+            
+            // Setup event listeners
+            function setupEventListeners() {
+                playBtn.addEventListener('click', speakText);
+                pauseBtn.addEventListener('click', pauseSpeech);
+                stopBtn.addEventListener('click', stopSpeech);
+                downloadBtn.addEventListener('click', downloadAudio);
+                
+                textInput.addEventListener('input', () => {
+                    if (textInput.value.trim() === '') {
+                        controls.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Speak the text
+            function speakText() {
+                if (isPlaying) {
+                    synth.resume();
+                    return;
+                }
+                
+                const text = textInput.value.trim();
+                if (!text) {
+                    alert('Please enter some text to convert to speech');
+                    return;
+                }
+                
+                const rate = parseFloat(rateSelect.value);
+                const voiceIndex = voiceSelect.value;
+                
+                if (!voiceIndex) {
+                    alert('Please select a voice');
+                    return;
+                }
+                
+                stopSpeech();
+                
+                utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = voices[voiceIndex];
+                utterance.rate
